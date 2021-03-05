@@ -35,4 +35,10 @@ public class Board {
 	public Piece piece(Position position) {
 		return pieces[position.getRow()][position.getColumn()];
 	}
+	
+	//Metodo para adicionar peças
+	//Atribui a peça para a posição, na matriz de pieces
+	public void placePiece(Piece piece, Position position) {
+		pieces[position.getRow()][position.getColumn()] = piece;
+	}
 }
