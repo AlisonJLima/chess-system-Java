@@ -26,39 +26,48 @@ public class ChessMatch {
 		}
 		return mat;
 	}
-	/* Metodo para movimentar peças , de uma posição de origem para uma posição de destino.
-	 * - converte a ChessPosition para uma posição de Matriz
-	 * - testa se tem peça na posiçao de origem
+
+	/*
+	 * Metodo para movimentar peças , de uma posição de origem para uma posição de
+	 * destino. - converte a ChessPosition para uma posição de Matriz - testa se tem
+	 * peça na posiçao de origem
 	 */
 	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
 		Position source = sourcePosition.toPosition();
 		Position target = targetPosition.toPosition();
 		validateSourcePosition(source);
+		validateTargetPosition(source,target);
 		Piece capturedPiece = makeMove(source, target);
-return (ChessPiece)capturedPiece;		
+		return (ChessPiece) capturedPiece;
 	}
-	
+
 	// Metodo que valida a existencia de uma peça na posiçao de origem
 	private void validateSourcePosition(Position position) {
-		if(!board.thereIsAPiece(position)){
+		if (!board.thereIsAPiece(position)) {
 			throw new ChessException("Nao existe peça na posição de origem!");
 		}
-		if(!board.piece(position).isThereAnyPossibleMove()) {
+		if (!board.piece(position).isThereAnyPossibleMove()) {
 			throw new ChessException("Nao existe movimentos possiveis para essa peça!");
 		}
-	}	
-		/*	Metodo responsavel pela logica da movimentação das peças
-		 * 	- remove a peça da posiçao de origem
-		 *  - remove a peça da posicao de destino (caso exista)
-		 *  - coloca a peça da posição de origem
-		*/
-		private Piece makeMove(Position source, Position target) {
-			Piece p = board.removePiece(source);
-			Piece capturedPiece = board.removePiece(target);
-			board.placePiece(p, target);
-			return capturedPiece;
-		}
+	}
 
+	private void validateTargetPosition(Position source, Position target) {
+		if (!board.piece(source).possibleMove(target)) {
+			throw new ChessException("A peça na posição de origem nao pode se mover para a posição de destino!");
+		}
+	}
+
+	/*
+	 * Metodo responsavel pela logica da movimentação das peças - remove a peça da
+	 * posiçao de origem - remove a peça da posicao de destino (caso exista) -
+	 * coloca a peça da posição de origem
+	 */
+	private Piece makeMove(Position source, Position target) {
+		Piece p = board.removePiece(source);
+		Piece capturedPiece = board.removePiece(target);
+		board.placePiece(p, target);
+		return capturedPiece;
+	}
 
 	// inserir peças no formato de posição de xadrez
 	private void placeNewPiece(char column, int row, ChessPiece piece) {
