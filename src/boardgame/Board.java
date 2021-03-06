@@ -7,7 +7,7 @@ public class Board {
 	private Piece[][] pieces;
 
 	public Board(int rows, int columns) {
-		//defensiva
+		// defensiva
 		if (rows < 1 || columns < 1) {
 			throw new BoardException("Erro ao criar o Tabuleiro: Deve ter pelo menos 1 linha e uma coluna");
 		}
@@ -44,24 +44,42 @@ public class Board {
 	// Atribui a peça para a posição, na matriz de pieces
 
 	public void placePiece(Piece piece, Position position) {
-		
+
 		if (thereIsAPiece(position)) {
 			throw new BoardException("Ja existe uma peça na posição " + position);
 		}
 		pieces[position.getRow()][position.getColumn()] = piece;
 		piece.position = position;
-
+	}
+	/* Metodo para remover peças do tabuleiro
+	 * Testa se a posição é uma posição valida
+	 * Testa se a posição ja contem uma peça, se o valor for nulo, simplesmente retornor nulo
+	 * AUX recebe a peça do tabuleiro -> atribui valor NULO para essa posição
+	 * atribui esse valor diretamente na matriz do tabuleiro
+	 */
+	public Piece removePiece(Position position) {
+		if (!positionExists(position)) {
+			throw new BoardException("Essa posição nao existe no tabuleiro!");
+		}
+		if (piece(position) == null) {
+			return null;
+		}
+		Piece aux = piece(position);
+		aux.position = null;
+		pieces[position.getRow()][position.getColumn()] = null;
+		return aux;
 	}
 
-
-	//metodo auxiliar para testar se uma posição é valida
+	// metodo auxiliar para testar se uma posição é valida
 	private boolean positionExists(int row, int column) {
 		return row >= 0 && row < rows && column >= 0 && column < columns;
 	}
-	//metodo para testar se a posição é valida
+
+	// metodo para testar se a posição é valida
 	public boolean positionExists(Position position) {
 		return positionExists(position.getRow(), position.getColumn());
-}
+	}
+
 	public boolean thereIsAPiece(Position position) {
 		if (!positionExists(position)) {
 			throw new BoardException("Posição inexistente no tabuleiro!");

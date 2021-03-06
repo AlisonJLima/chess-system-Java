@@ -1,6 +1,8 @@
 package chess;
 
 import boardgame.Board;
+import boardgame.Piece;
+import boardgame.Position;
 import chess.pieces.King;
 import chess.pieces.Rook;
 
@@ -24,6 +26,36 @@ public class ChessMatch {
 		}
 		return mat;
 	}
+	/* Metodo para movimentar peças , de uma posição de origem para uma posição de destino.
+	 * - converte a ChessPosition para uma posição de Matriz
+	 * - testa se tem peça na posiçao de origem
+	 */
+	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
+		Position source = sourcePosition.toPosition();
+		Position target = targetPosition.toPosition();
+		validateSourcePosition(source);
+		Piece capturedPiece = makeMove(source, target);
+return (ChessPiece)capturedPiece;		
+	}
+	
+	// Metodo que valida a existencia de uma peça na posiçao de origem
+	private void validateSourcePosition(Position position) {
+		if(!board.thereIsAPiece(position)){
+			throw new ChessException("Nao existe peça na posição de origem!");
+		}
+	}	
+		/*	Metodo responsavel pela logica da movimentação das peças
+		 * 	- remove a peça da posiçao de origem
+		 *  - remove a peça da posicao de destino (caso exista)
+		 *  - coloca a peça da posição de origem
+		*/
+		private Piece makeMove(Position source, Position target) {
+			Piece p = board.removePiece(source);
+			Piece capturedPiece = board.removePiece(target);
+			board.placePiece(p, target);
+			return capturedPiece;
+		}
+
 
 	// inserir peças no formato de posição de xadrez
 	private void placeNewPiece(char column, int row, ChessPiece piece) {
