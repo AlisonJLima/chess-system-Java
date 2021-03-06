@@ -26,6 +26,14 @@ public class ChessMatch {
 		}
 		return mat;
 	}
+	//Metodo para imprimir as posiçoes possiveis atraves da posição de origem
+	
+	public boolean[][] possibleMoves(ChessPosition sourcePosition){
+		Position position = sourcePosition.toPosition();
+		validateSourcePosition(position);
+		return board.piece(position).possibleMoves();
+		
+	}
 
 	/*
 	 * Metodo para movimentar peças , de uma posição de origem para uma posição de
