@@ -9,11 +9,23 @@ import chess.pieces.Rook;
 public class ChessMatch {
 	// Classe que implementa as regras do jogo!
 
+	private int turn;
+	private Color currentPlayer;
 	private Board board;
 
 	public ChessMatch() {
 		board = new Board(8, 8);
+		turn = 1;
+		currentPlayer = Color.WHITE;
 		initialSetup();
+	}
+
+	public int getTurn() {
+		return turn;
+	}
+
+	public Color getCurrentPlayer() {
+		return currentPlayer;
 	}
 
 	public ChessPiece[][] getPieces() {
@@ -26,13 +38,13 @@ public class ChessMatch {
 		}
 		return mat;
 	}
-	//Metodo para imprimir as posiçoes possiveis atraves da posição de origem
-	
-	public boolean[][] possibleMoves(ChessPosition sourcePosition){
+	// Metodo para imprimir as posiçoes possiveis atraves da posição de origem
+
+	public boolean[][] possibleMoves(ChessPosition sourcePosition) {
 		Position position = sourcePosition.toPosition();
 		validateSourcePosition(position);
 		return board.piece(position).possibleMoves();
-		
+
 	}
 
 	/*
@@ -44,8 +56,9 @@ public class ChessMatch {
 		Position source = sourcePosition.toPosition();
 		Position target = targetPosition.toPosition();
 		validateSourcePosition(source);
-		validateTargetPosition(source,target);
+		validateTargetPosition(source, target);
 		Piece capturedPiece = makeMove(source, target);
+		nextTurn();
 		return (ChessPiece) capturedPiece;
 	}
 
@@ -54,6 +67,11 @@ public class ChessMatch {
 		if (!board.thereIsAPiece(position)) {
 			throw new ChessException("Nao existe peça na posição de origem!");
 		}
+
+		if (currentPlayer != ((ChessPiece) board.piece(position)).getColor()) {
+			throw new ChessException("A peça escolhida não é sua!");
+		}
+
 		if (!board.piece(position).isThereAnyPossibleMove()) {
 			throw new ChessException("Nao existe movimentos possiveis para essa peça!");
 		}
@@ -75,6 +93,13 @@ public class ChessMatch {
 		Piece capturedPiece = board.removePiece(target);
 		board.placePiece(p, target);
 		return capturedPiece;
+	}
+
+	// metodo para troca de turno
+	private void nextTurn() {
+		turn++;
+		// condição ternaria para troca de jogador por turno
+		currentPlayer = (currentPlayer == Color.WHITE) ? Color.BLACK : Color.WHITE;
 	}
 
 	// inserir peças no formato de posição de xadrez
