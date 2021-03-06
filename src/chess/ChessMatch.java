@@ -43,6 +43,9 @@ return (ChessPiece)capturedPiece;
 		if(!board.thereIsAPiece(position)){
 			throw new ChessException("Nao existe peça na posição de origem!");
 		}
+		if(!board.piece(position).isThereAnyPossibleMove()) {
+			throw new ChessException("Nao existe movimentos possiveis para essa peça!");
+		}
 	}	
 		/*	Metodo responsavel pela logica da movimentação das peças
 		 * 	- remove a peça da posiçao de origem
