@@ -18,7 +18,7 @@ public abstract class ChessPiece extends Piece {
 		return color;
 	}
 	
-	public ChessPosition getChesssPosition() {
+	public ChessPosition getChessPosition() {
 		return ChessPosition.fromPosition(position);
 	}
 	//Metodo que testa se existe uma peça na posição e se é uma peça do oponente

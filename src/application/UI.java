@@ -33,13 +33,13 @@ public class UI {
 	public static final String ANSI_PURPLE_BACKGROUND = "\u001B[45m";
 	public static final String ANSI_CYAN_BACKGROUND = "\u001B[46m";
 	public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
-	
+
 	// https://stackoverflow.com/questions/2979383/java-clear-the-console
 	public static void clearScreen() {
 		System.out.print("\033[H\033[2J");
 		System.out.flush();
-	} 
-	
+	}
+
 	// metodo para fazer leitura da posição do xadrez
 	public static ChessPosition readChessPosition(Scanner sc) {
 		try {
@@ -47,21 +47,28 @@ public class UI {
 			char column = s.charAt(0);
 			int row = Integer.parseInt(s.substring(1));
 			return new ChessPosition(column, row);
-		} 
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			throw new InputMismatchException("Erro ao ler a Posição. Valores validos são de a1 ate h8.");
 		}
 	}
-	
-	public static void printMatch (ChessMatch chessMatch, List<ChessPiece> captured) {
+
+	public static void printMatch(ChessMatch chessMatch, List<ChessPiece> captured) {
 		printBoard(chessMatch.getPieces());
 		System.out.println();
 		printCapturedPieces(captured);
 		System.out.println();
 		System.out.println("Turno: " + chessMatch.getTurn());
-		System.out.println("Aguardando Jogador: " + chessMatch.getCurrentPlayer());
-		if(chessMatch.getCheck()) {
-			System.out.println("XEQUE!");
+		
+		//teste de xeque e xequemate
+		if (!chessMatch.getCheckMate()) {
+			System.out.println("Aguardando Jogador: " + chessMatch.getCurrentPlayer());
+			if (chessMatch.getCheck()) {
+				System.out.println("XEQUE!");
+			}
+		}
+		else {
+			System.out.println("XEQUEMATE!");
+			System.out.println("Vencedor: " + chessMatch.getCurrentPlayer());
 		}
 	}
 
@@ -75,13 +82,13 @@ public class UI {
 		}
 		System.out.println("  a b c d e f g h ");
 	}
-	
-	//sobrecarga
+
+	// sobrecarga
 	public static void printBoard(ChessPiece[][] pieces, boolean[][] possibleMoves) {
 		for (int i = 0; i < pieces.length; i++) {
 			System.out.print((8 - i) + " ");
 			for (int j = 0; j < pieces.length; j++) {
-				printPiece(pieces[i][j],possibleMoves[i][j]);
+				printPiece(pieces[i][j], possibleMoves[i][j]);
 			}
 			System.out.println();
 		}
@@ -92,7 +99,7 @@ public class UI {
 	private static void printPiece(ChessPiece piece, boolean background) {
 		if (background) {
 			System.out.print(ANSI_BLUE_BACKGROUND);
-			
+
 		}
 		if (piece == null) {
 			System.out.print("-" + ANSI_RESET);
@@ -105,22 +112,25 @@ public class UI {
 		}
 		System.out.print(" ");
 	}
-	
+
 	// metodo estatico, para imprimir as peças capturadas..
-	// expressao lambda para filtrar lista... converte em stream, usa a função filter e filtra pela cor converte novamente em Lista.
+	// expressao lambda para filtrar lista... converte em stream, usa a função
+	// filter e filtra pela cor converte novamente em Lista.
 	private static void printCapturedPieces(List<ChessPiece> captured) {
-	List<ChessPiece> white = captured.stream().filter(x -> x.getColor() == Color.WHITE).collect(Collectors.toList());
-	List<ChessPiece> black = captured.stream().filter(x -> x.getColor() == Color.BLACK).collect(Collectors.toList());
-	System.out.println("Peças Capturadas: ");
-	System.out.print("Brancas: ");
-	System.out.print(ANSI_WHITE);
-	System.out.print(Arrays.toString(white.toArray()));
-	System.out.println(ANSI_RESET);
-	System.out.print("Pretas:  ");
-	System.out.print(ANSI_YELLOW);
-	System.out.print(Arrays.toString(black.toArray()));
-	System.out.print(ANSI_RESET);
-	
+		List<ChessPiece> white = captured.stream().filter(x -> x.getColor() == Color.WHITE)
+				.collect(Collectors.toList());
+		List<ChessPiece> black = captured.stream().filter(x -> x.getColor() == Color.BLACK)
+				.collect(Collectors.toList());
+		System.out.println("Peças Capturadas: ");
+		System.out.print("Brancas: ");
+		System.out.print(ANSI_WHITE);
+		System.out.print(Arrays.toString(white.toArray()));
+		System.out.println(ANSI_RESET);
+		System.out.print("Pretas:  ");
+		System.out.print(ANSI_YELLOW);
+		System.out.print(Arrays.toString(black.toArray()));
+		System.out.print(ANSI_RESET);
+
 	}
 
 }

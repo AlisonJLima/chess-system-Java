@@ -17,6 +17,7 @@ public class ChessMatch {
 	private Color currentPlayer;
 	private Board board;
 	private boolean check;
+	private boolean checkMate;
 
 	private List<Piece> piecesOnTheBoard = new ArrayList<>();
 	private List<Piece> capturedPieces = new ArrayList<>();
@@ -39,6 +40,10 @@ public class ChessMatch {
 
 	public boolean getCheck() {
 		return check;
+	}
+
+	public boolean getCheckMate() {
+		return checkMate;
 	}
 
 	public ChessPiece[][] getPieces() {
@@ -72,14 +77,20 @@ public class ChessMatch {
 		validateTargetPosition(source, target);
 		Piece capturedPiece = makeMove(source, target);
 
-		if (testeCheck(currentPlayer)) {
+		if (testCheck(currentPlayer)) {
 			undoMove(source, target, capturedPiece);
 			throw new ChessException("Você não pode se colocar em xeque");
 		}
-		// condição que testa se o adversario entrou me xeque
-		check = (testeCheck(opponent(currentPlayer))) ? true : false;
 
-		nextTurn();
+		// condição que testa se o adversario entrou me xeque
+		check = (testCheck(opponent(currentPlayer))) ? true : false;
+
+		// testando se a jogada colocou adversario em xequemate
+		if (testChekMate(opponent(currentPlayer))) {
+			checkMate = true;
+		} else {
+			nextTurn();
+		}
 		return (ChessPiece) capturedPiece;
 	}
 
@@ -156,21 +167,57 @@ public class ChessMatch {
 				return (ChessPiece) p;
 			}
 		}
-		throw new IllegalStateException("Nao existe rei da cor" + color + " no tabuleiro");
+		throw new IllegalStateException("Nao existe Rei " + color + "no tabuleiro");
 	}
 
 	// metodo para testar se o rei está em xeque
-	private boolean testeCheck(Color color) {
-		Position kingPosition = king(color).getChesssPosition().toPosition();
+	private boolean testCheck(Color color) {
+		Position kingPosition = king(color).getChessPosition().toPosition();
 		List<Piece> opponentPieces = piecesOnTheBoard.stream()
 				.filter(x -> ((ChessPiece) x).getColor() == opponent(color)).collect(Collectors.toList());
 		for (Piece p : opponentPieces) {
-			boolean[][] mat = p.possibleMoves(); // movimentos possiveis da peça adversaria P
+			boolean[][] mat = p.possibleMoves();
 			if (mat[kingPosition.getRow()][kingPosition.getColumn()]) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	/*
+	 * Logica: criar uma lista com as peças do oponente no tabuleiro, percorrer essa
+	 * lista e guardando os movimentos possiveis numa matriz auxiliar mat percorrer
+	 * essa matriz auxiliar testando se é um movimento possivel e se tira do Xeque:
+	 * -> pegar a posição de origem da peça P. fazendo um downcast para chesspiece,
+	 * pegando a chessposition e convertendo em position com o toPosition. ->
+	 * Posição destino será mat[i][j] -> fazer o movimento -> testar se ainda segue
+	 * em xeque -> desfazer o movimento logo em seguida e em caso de teste negativo,
+	 * retornar falso para xequemate
+	 * 
+	 */
+	private boolean testChekMate(Color color) {
+		if (!testCheck(color)) {
+			return false;
+		}
+		List<Piece> list = piecesOnTheBoard.stream().filter(x -> ((ChessPiece) x).getColor() == color).collect(Collectors.toList());
+		for (Piece p : list) {
+			boolean[][] mat = p.possibleMoves(); // mat recebe os movimentos possiveis de p.
+			for (int i = 0; i < board.getRows(); i++) {
+				for (int j = 0; j < board.getColumns(); j++) {
+					if (mat[i][j]) {
+						Position source = ((ChessPiece) p).getChessPosition().toPosition();
+						Position target = new Position(i, j);
+						Piece capturedPiece = makeMove(source, target);
+						boolean testCheck = testCheck(color);
+						undoMove(source, target, capturedPiece);
+						if (!testCheck) {
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	// inserir peças no formato de posição de xadrez
@@ -180,19 +227,12 @@ public class ChessMatch {
 	}
 
 	private void initialSetup() {
-		placeNewPiece('c', 1, new Rook(board, Color.WHITE));
-		placeNewPiece('c', 2, new Rook(board, Color.WHITE));
-		placeNewPiece('d', 2, new Rook(board, Color.WHITE));
-		placeNewPiece('e', 2, new Rook(board, Color.WHITE));
-		placeNewPiece('e', 1, new Rook(board, Color.WHITE));
-		placeNewPiece('d', 1, new King(board, Color.WHITE));
+		placeNewPiece('h', 7, new Rook(board, Color.WHITE));
+		placeNewPiece('d', 1, new Rook(board, Color.WHITE));
+		placeNewPiece('e', 1, new King(board, Color.WHITE));
 
-		placeNewPiece('c', 7, new Rook(board, Color.BLACK));
-		placeNewPiece('c', 8, new Rook(board, Color.BLACK));
-		placeNewPiece('d', 7, new Rook(board, Color.BLACK));
-		placeNewPiece('e', 7, new Rook(board, Color.BLACK));
-		placeNewPiece('e', 8, new Rook(board, Color.BLACK));
-		placeNewPiece('d', 8, new King(board, Color.BLACK));
+		placeNewPiece('b', 8, new Rook(board, Color.BLACK));
+		placeNewPiece('a', 8, new King(board, Color.BLACK));
 
 	}
 }
